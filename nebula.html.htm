@@ -1,0 +1,2176 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星雲 · 재와 불씨</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void:#07050a;
+    --fire-bg:#170406;
+    --fire-bg-2:#210709;
+    --fire:#7A1519;
+    --fire-ember:#e0492f;
+    --fire-dim:#3a1012;
+    --ash-bg:#0a0d12;
+    --ash-bg-2:#0d1217;
+    --ash:#4A5568;
+    --ash-glow:#a9b8ca;
+    --ash-dim:#232a33;
+    --ink:#F4F4F5;
+    --ink-dim:#8a8a92;
+    --ink-faint:#55555c;
+    --serif:'Noto Serif KR', serif;
+    --sans:'Noto Sans KR', sans-serif;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{background:var(--bg-void); scroll-behavior:smooth;}
+
+  body{
+    background:var(--bg-void);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  /* ===== Utility ===== */
+  ::selection{ background:var(--fire); color:var(--ink); }
+  button{ font-family:inherit; cursor:pointer; }
+  a{ color:inherit; text-decoration:none; }
+
+  /* ===== Top label ===== */
+  .kicker{
+    position:absolute;
+    top:28px; left:32px;
+    font-family:var(--sans);
+    font-weight:700;
+    font-size:11px;
+    letter-spacing:0.28em;
+    color:var(--ink-faint);
+    z-index:20;
+  }
+
+  /* ===== Hero / Title block (shared by landing + personal tab header) ===== */
+  .hero{
+    position:relative;
+    padding:96px 24px 72px;
+    text-align:center;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 0%, rgba(122,21,25,0.22), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 0%, rgba(74,85,104,0.20), transparent 60%),
+      var(--bg-void);
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    overflow:hidden;
+  }
+
+  .hero-hanja{
+    font-family:var(--serif);
+    font-weight:900;
+    font-size:clamp(64px, 13vw, 148px);
+    line-height:1;
+    letter-spacing:0.08em;
+    background:linear-gradient(115deg, var(--fire-ember) 0%, #b8442f 18%, #d9d9dc 48%, var(--ash-glow) 62%, var(--ash) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+    filter:drop-shadow(0 0 40px rgba(122,21,25,0.15));
+    position:relative;
+    z-index:2;
+  }
+
+  .hero-hangul{
+    margin-top:10px;
+    font-family:var(--sans);
+    font-weight:500;
+    font-size:15px;
+    letter-spacing:0.9em;
+    padding-left:0.9em;
+    color:var(--ink-dim);
+    position:relative;
+    z-index:2;
+  }
+
+  .hero-divider{
+    width:1px; height:44px;
+    margin:34px auto 30px;
+    background:linear-gradient(to bottom, transparent, var(--ink-faint), transparent);
+    position:relative;
+    z-index:2;
+  }
+
+  .hero-sub{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:clamp(26px, 4.4vw, 40px);
+    letter-spacing:0.02em;
+    position:relative;
+    z-index:2;
+  }
+  .hero-sub .c-ash{ color:#4A5568; }
+  .hero-sub .c-join{ color:#4A5568; opacity:0.55; font-weight:400; }
+  .hero-sub .c-ember{ color:#7A1519; }
+
+  .hero-tagline{
+    margin-top:18px;
+    font-size:12.5px;
+    letter-spacing:0.18em;
+    color:var(--ink-faint);
+    position:relative;
+    z-index:2;
+  }
+
+  /* ===== Landing (full screen gate) ===== */
+  .landing{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    background:
+      radial-gradient(ellipse 70% 55% at 18% 8%, rgba(122,21,25,0.26), transparent 60%),
+      radial-gradient(ellipse 70% 55% at 82% 92%, rgba(74,85,104,0.22), transparent 60%),
+      var(--bg-void);
+    padding:24px;
+    transition:opacity 0.9s ease, visibility 0.9s ease;
+  }
+  .landing.leaving{ opacity:0; visibility:hidden; pointer-events:none; }
+  .landing::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(115deg, rgba(224,73,47,0.035) 0px, rgba(224,73,47,0.035) 1px, transparent 1px, transparent 90px),
+      repeating-linear-gradient(-115deg, rgba(169,184,202,0.03) 0px, rgba(169,184,202,0.03) 1px, transparent 1px, transparent 90px);
+    pointer-events:none;
+  }
+  .landing-embers span{
+    position:absolute;
+    width:3px; height:3px;
+    border-radius:50%;
+    background:var(--fire-ember);
+    box-shadow:0 0 8px 2px rgba(224,73,47,0.75);
+    animation:landing-drift 9s ease-in-out infinite;
+    opacity:0;
+  }
+  @keyframes landing-drift{
+    0%{ transform:translateY(0); opacity:0; }
+    15%{ opacity:0.85; }
+    55%{ opacity:0.45; }
+    100%{ transform:translateY(-160px); opacity:0; }
+  }
+  .landing .hero{ padding:0; border-bottom:none; background:none; position:relative; z-index:2; }
+  .landing .hero-hanja{ filter:drop-shadow(0 0 60px rgba(122,21,25,0.25)); }
+
+  .enter-wrap{
+    margin-top:56px;
+    position:relative;
+    z-index:2;
+  }
+  .enter-btn{
+    position:relative;
+    padding:16px 46px;
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.18);
+    color:var(--ink-dim);
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:12.5px;
+    letter-spacing:0.3em;
+    overflow:hidden;
+    transition:color 0.4s ease, border-color 0.4s ease, letter-spacing 0.4s ease;
+  }
+  .enter-btn::before{
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse 60% 100% at 50% 100%, rgba(224,73,47,0.55), transparent 70%);
+    opacity:0;
+    transition:opacity 0.5s ease;
+    z-index:-1;
+  }
+  .enter-btn:hover{
+    color:var(--ink);
+    border-color:rgba(224,73,47,0.55);
+    letter-spacing:0.36em;
+  }
+  .enter-btn:hover::before{ opacity:1; }
+  .enter-btn .en{
+    display:block;
+    margin-top:6px;
+    font-size:9.5px;
+    letter-spacing:0.4em;
+    color:var(--ink-faint);
+  }
+  .landing-hint{
+    margin-top:20px;
+    font-size:10.5px;
+    letter-spacing:0.14em;
+    color:var(--ink-faint);
+    opacity:0.7;
+    position:relative;
+    z-index:2;
+  }
+
+  /* ===== Site nav ===== */
+  .site-nav{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:rgba(5,3,7,0.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  .nav-inner{
+    max-width:920px;
+    margin:0 auto;
+    display:flex;
+    justify-content:center;
+    gap:2px;
+  }
+  .nav-tab{
+    background:transparent;
+    border:none;
+    border-bottom:2px solid transparent;
+    color:var(--ink-faint);
+    font-size:12.5px;
+    font-weight:700;
+    letter-spacing:0.16em;
+    padding:18px 22px 15px;
+    transition:color 0.3s ease, border-color 0.3s ease, text-shadow 0.3s ease;
+  }
+  .nav-tab:hover{ color:var(--ink-dim); }
+  .nav-tab.active{
+    color:var(--ink);
+    border-bottom-color:var(--fire-ember);
+    text-shadow:0 0 16px rgba(224,73,47,0.55);
+  }
+  .nav-tab.active[data-tab="images"],
+  .nav-tab.active[data-tab="records"]{
+    border-bottom-color:var(--ash-glow);
+    text-shadow:0 0 16px rgba(169,184,202,0.45);
+  }
+
+  /* ===== Tab panels ===== */
+  .tab-panel{ display:none; }
+  .tab-panel.active{ display:block; animation:panel-in 0.5s ease; }
+  @keyframes panel-in{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:translateY(0);} }
+
+  /* ===== Split section (personal narrative) ===== */
+  .split{
+    position:relative;
+    display:grid;
+    grid-template-columns:1fr 1px 1fr;
+    align-items:stretch;
+  }
+
+  .seam{
+    position:relative;
+    background:linear-gradient(to bottom, var(--fire-dim), var(--ash-dim));
+    overflow:visible;
+  }
+  .seam::before{
+    content:'';
+    position:absolute; inset:0;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(224,73,47,0.55) 0px, rgba(224,73,47,0.55) 2px,
+      transparent 2px, transparent 14px
+    );
+    mix-blend-mode:screen;
+    opacity:0.5;
+  }
+  .ember-particle{
+    position:absolute;
+    width:3px; height:3px;
+    border-radius:50%;
+    background:var(--fire-ember);
+    box-shadow:0 0 6px 1px rgba(224,73,47,0.8);
+    animation:drift 7s ease-in-out infinite;
+    left:-1px;
+  }
+  .ember-particle.smoke{
+    background:var(--ash-glow);
+    box-shadow:0 0 8px 2px rgba(169,184,202,0.5);
+  }
+  @keyframes drift{
+    0%{ transform:translate(0,0); opacity:0; }
+    12%{ opacity:0.9; }
+    50%{ transform:translate(3px,-40px); opacity:0.6; }
+    88%{ opacity:0; }
+    100%{ transform:translate(-2px,-90px); opacity:0; }
+  }
+
+  .side{
+    position:relative;
+    padding:64px 40px 120px;
+    min-width:0;
+  }
+  .side.fire{
+    background:
+      radial-gradient(ellipse 120% 60% at 100% 0%, rgba(122,21,25,0.30), transparent 55%),
+      linear-gradient(180deg, var(--fire-bg-2), var(--fire-bg) 30%, #0c0304 100%);
+  }
+  .side.ash{
+    background:
+      radial-gradient(ellipse 120% 60% at 0% 0%, rgba(74,85,104,0.24), transparent 55%),
+      linear-gradient(180deg, var(--ash-bg-2), var(--ash-bg) 30%, #060708 100%);
+  }
+
+  .name-block{ margin-bottom:8px; position:relative; padding:14px 4px 0 16px; }
+  .name-block::before, .name-block::after{
+    content:'';
+    position:absolute;
+    width:20px; height:20px;
+    border-style:solid;
+    border-width:0;
+    opacity:0.65;
+  }
+  .name-block::before{
+    top:-6px; left:-6px;
+    border-top-width:1px; border-left-width:1px;
+  }
+  .name-block::after{
+    top:-6px; left:34px;
+    width:56px; height:8px;
+    border-top-width:1px;
+  }
+  .fire .name-block::before, .fire .name-block::after{ border-color:var(--fire-ember); }
+  .ash .name-block::before, .ash .name-block::after{ border-color:var(--ash-glow); }
+
+  .surname{
+    font-family:var(--sans);
+    font-weight:300;
+    font-size:12px;
+    letter-spacing:0.32em;
+    margin-bottom:14px;
+  }
+  .fire .surname{ color:#b8564a; }
+  .ash .surname{ color:#8592a3; }
+
+  .charname{
+    font-family:var(--serif);
+    font-weight:900;
+    font-size:clamp(38px, 5vw, 54px);
+    letter-spacing:0.03em;
+    line-height:1;
+    margin-bottom:18px;
+  }
+  .fire .charname{ color:#F4F4F5; text-shadow:0 0 30px rgba(224,73,47,0.35); }
+  .ash .charname{ color:#F4F4F5; text-shadow:0 0 30px rgba(169,184,202,0.18); }
+
+  .meta-row{
+    display:flex; flex-wrap:wrap; gap:8px 0;
+    font-size:12.5px;
+    color:var(--ink-dim);
+    margin-bottom:28px;
+  }
+  .meta-row span:not(:last-child)::after{
+    content:'·';
+    margin:0 9px;
+    color:var(--ink-faint);
+  }
+  .fire .meta-row .accent{ color:var(--fire-ember); font-weight:700; }
+  .ash .meta-row .accent{ color:var(--ash-glow); font-weight:700; }
+
+  .quote-line{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:15px;
+    color:var(--ink-dim);
+    padding-left:14px;
+    border-left:2px solid rgba(255,255,255,0.12);
+    margin-bottom:40px;
+  }
+
+  .story-block{ margin-bottom:34px; }
+  .story-head{
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:10px;
+  }
+  .story-mark{
+    font-size:14px;
+    font-weight:900;
+  }
+  .fire .story-mark{ color:var(--fire-ember); }
+  .ash .story-mark{ color:var(--ash-glow); }
+
+  .story-title{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:16.5px;
+    letter-spacing:0.01em;
+    color:var(--ink);
+  }
+
+  .story-body{
+    font-size:14.5px;
+    line-height:1.92;
+    color:#c7c6c9;
+    letter-spacing:-0.005em;
+  }
+  .story-body strong{
+    color:var(--ink);
+    font-weight:700;
+  }
+  .fire .story-body strong{ color:#f0a294; }
+  .ash .story-body strong{ color:#c3ccd6; }
+
+  .exchange{
+    position:relative;
+    margin-top:28px;
+    padding:20px 22px;
+    background:rgba(0,0,0,0.28);
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:2px;
+    font-family:var(--serif);
+    font-size:14px;
+    line-height:2.05;
+    color:#d8d7d9;
+  }
+  .exchange::before{
+    content:'印';
+    position:absolute;
+    top:-15px; left:18px;
+    width:28px; height:28px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif);
+    font-size:13px;
+    font-weight:900;
+    color:var(--bg-void);
+    background:var(--fire-ember);
+    border-radius:2px;
+    transform:rotate(-6deg);
+    box-shadow:0 0 12px rgba(224,73,47,0.5);
+  }
+  .ash .exchange::before{
+    background:var(--ash-glow);
+    box-shadow:0 0 12px rgba(169,184,202,0.4);
+  }
+  .exchange .who{
+    display:block;
+    margin-top:8px;
+    font-family:var(--sans);
+    font-size:11.5px;
+    letter-spacing:0.15em;
+    color:var(--ink-faint);
+    text-align:right;
+  }
+
+  .divider-thin{
+    width:36px; height:1px;
+    background:var(--ink-faint);
+    opacity:0.4;
+    margin:38px 0;
+  }
+
+  /* ===== Combined narrative (accordion) ===== */
+  .combined-wrap{
+    max-width:820px;
+    margin:0 auto;
+    padding:64px 24px 100px;
+  }
+  .combined-intro{
+    text-align:center;
+    margin-bottom:52px;
+  }
+  .combined-intro .ci-mark{
+    font-family:var(--serif);
+    font-size:13px;
+    letter-spacing:0.4em;
+    color:var(--ink-faint);
+  }
+  .combined-intro h2{
+    margin-top:14px;
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:clamp(22px, 3.4vw, 30px);
+    color:var(--ink);
+  }
+  .combined-intro p{
+    margin-top:12px;
+    font-size:13px;
+    color:var(--ink-dim);
+    line-height:1.8;
+  }
+
+  .episode{
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:3px;
+    margin-bottom:14px;
+    background:rgba(255,255,255,0.015);
+    overflow:hidden;
+  }
+  .episode-header{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:22px 24px;
+    background:transparent;
+    border:none;
+    text-align:left;
+  }
+  .ep-badge{
+    flex:0 0 auto;
+    width:34px; height:34px;
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px;
+    border:1px solid rgba(255,255,255,0.12);
+  }
+  .episode[data-badge="fire"] .ep-badge{
+    color:var(--fire-ember);
+    background:radial-gradient(circle, rgba(224,73,47,0.18), transparent 70%);
+    border-color:rgba(224,73,47,0.35);
+  }
+  .episode[data-badge="ash"] .ep-badge{
+    color:var(--ash-glow);
+    background:radial-gradient(circle, rgba(169,184,202,0.14), transparent 70%);
+    border-color:rgba(169,184,202,0.3);
+  }
+  .ep-num{
+    flex:0 0 auto;
+    font-family:var(--serif);
+    font-weight:900;
+    font-size:13px;
+    color:var(--ink-faint);
+    width:26px;
+  }
+  .ep-title{
+    flex:1 1 auto;
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:16.5px;
+    color:var(--ink);
+  }
+  .ep-sub{
+    display:block;
+    margin-top:3px;
+    font-family:var(--sans);
+    font-weight:400;
+    font-size:11.5px;
+    letter-spacing:0.08em;
+    color:var(--ink-faint);
+  }
+  .ep-arrow{
+    flex:0 0 auto;
+    font-size:12px;
+    color:var(--ink-faint);
+    transition:transform 0.35s ease;
+  }
+  .episode.open .ep-arrow{ transform:rotate(180deg); color:var(--fire-ember); }
+
+  .episode-body-outer{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.55s cubic-bezier(0.4,0,0.2,1);
+  }
+  .episode-body{
+    padding:6px 26px 30px 76px;
+    position:relative;
+    background:
+      repeating-linear-gradient(115deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 22px),
+      rgba(0,0,0,0.22);
+    backdrop-filter:blur(2px);
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+  .episode-body .story-body{ margin-bottom:4px; }
+  .episode-body .exchange{ margin-left:0; }
+
+  /* ===== Images tab ===== */
+  .images-wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:64px 24px 100px;
+  }
+  .section-heading{
+    text-align:center;
+    margin-bottom:44px;
+  }
+  .section-heading .sh-mark{
+    font-family:var(--serif);
+    font-size:13px;
+    letter-spacing:0.4em;
+    color:var(--ink-faint);
+  }
+  .section-heading h2{
+    margin-top:14px;
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:clamp(22px, 3.4vw, 30px);
+  }
+
+  .img-upload-panel{
+    max-width:520px;
+    margin:0 auto 44px;
+    padding:22px;
+    border:1px dashed rgba(224,73,47,0.35);
+    border-radius:3px;
+    background:rgba(224,73,47,0.04);
+  }
+  .img-upload-panel label{
+    display:block;
+    font-size:11px;
+    letter-spacing:0.14em;
+    color:var(--ink-faint);
+    margin-bottom:6px;
+  }
+  .img-upload-panel input[type="text"],
+  .img-upload-panel input[type="url"],
+  .img-upload-panel textarea{
+    width:100%;
+    background:rgba(0,0,0,0.35);
+    border:1px solid rgba(255,255,255,0.1);
+    color:var(--ink);
+    font-size:13px;
+    padding:10px 12px;
+    margin-bottom:14px;
+    font-family:var(--sans);
+  }
+  .img-upload-panel input[type="file"]{
+    width:100%;
+    font-size:12px;
+    color:var(--ink-dim);
+    margin-bottom:14px;
+  }
+  .field-row{ margin-bottom:14px; }
+  .btn-solid{
+    background:var(--fire-ember);
+    color:#1a0705;
+    border:none;
+    padding:11px 22px;
+    font-weight:700;
+    font-size:12.5px;
+    letter-spacing:0.08em;
+    border-radius:2px;
+    transition:filter 0.3s ease;
+  }
+  .btn-solid:hover{ filter:brightness(1.15); }
+  .btn-ghost{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.18);
+    color:var(--ink-dim);
+    padding:10px 18px;
+    font-size:12px;
+    letter-spacing:0.06em;
+    border-radius:2px;
+  }
+  .btn-ghost:hover{ border-color:rgba(255,255,255,0.4); color:var(--ink); }
+
+  .publish-hint{
+    font-size:11px;
+    line-height:1.6;
+    color:var(--ink-faint);
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:2px;
+    padding:10px 12px;
+    margin:14px 0;
+  }
+  .publish-hint strong{ color:var(--fire-ember); }
+  .export-box{ margin-top:12px; }
+  .export-box textarea{
+    width:100%;
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,255,255,0.12);
+    color:var(--ink-dim);
+    font-family:monospace;
+    font-size:10.5px;
+    line-height:1.5;
+    padding:10px;
+    margin-bottom:10px;
+    resize:vertical;
+  }
+  .export-note{
+    font-size:10.5px;
+    color:var(--ink-faint);
+    margin-top:8px;
+    line-height:1.6;
+  }
+  .draft-badge{
+    position:absolute;
+    top:8px; left:8px;
+    background:rgba(224,73,47,0.85);
+    color:#1a0705;
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:0.08em;
+    padding:2px 7px;
+    border-radius:2px;
+    z-index:2;
+  }
+  .draft-badge-inline{
+    position:static;
+    display:inline-block;
+    background:rgba(224,73,47,0.18);
+    color:var(--fire-ember);
+    font-size:9px;
+    font-weight:900;
+    letter-spacing:0.06em;
+    padding:2px 6px;
+    border-radius:2px;
+  }
+
+  .img-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:18px;
+  }
+  .img-card{
+    position:relative;
+    border:1px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.02);
+    border-radius:3px;
+    overflow:hidden;
+    transition:transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+    cursor:pointer;
+  }
+  .img-card:hover{
+    transform:translateY(-6px);
+    border-color:rgba(224,73,47,0.4);
+    box-shadow:0 14px 34px rgba(122,21,25,0.28);
+  }
+  .img-card .thumb{
+    width:100%; aspect-ratio:3/4;
+    object-fit:cover;
+    display:block;
+    background:#0a0709;
+  }
+  .img-card .cap{
+    padding:8px 10px 10px;
+    font-size:10.5px;
+    color:var(--ink-faint);
+    letter-spacing:0.02em;
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+  .img-card .del-btn{
+    position:absolute; top:8px; right:8px;
+    width:24px; height:24px;
+    background:rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.2);
+    color:var(--ink-dim);
+    border-radius:2px;
+    font-size:12px;
+    display:none;
+    align-items:center; justify-content:center;
+  }
+  .img-card.admin-mode .del-btn{ display:flex; }
+  .img-card .edit-btn{
+    position:absolute; top:8px; right:38px;
+    width:24px; height:24px;
+    background:rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.2);
+    color:var(--ink-dim);
+    border-radius:2px;
+    font-size:12px;
+    display:none;
+    align-items:center; justify-content:center;
+  }
+  .img-card.admin-mode .edit-btn{ display:flex; }
+  .empty-note{
+    text-align:center;
+    color:var(--ink-faint);
+    font-size:12.5px;
+    padding:40px 0;
+    letter-spacing:0.05em;
+  }
+
+  /* Lightbox */
+  .lightbox-overlay{
+    position:fixed; inset:0; z-index:2000;
+    background:rgba(4,2,5,0.92);
+    display:flex; align-items:center; justify-content:center;
+    padding:40px;
+  }
+  .lightbox-overlay[hidden]{ display:none; }
+  .lightbox-overlay img{
+    max-width:90vw; max-height:82vh;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.1);
+  }
+  .lightbox-close{
+    position:absolute; top:26px; right:32px;
+    background:transparent; border:1px solid rgba(255,255,255,0.25);
+    color:var(--ink); width:38px; height:38px;
+    border-radius:50%; font-size:16px;
+  }
+
+  /* ===== Records tab ===== */
+  .records-wrap{
+    max-width:1080px;
+    margin:0 auto;
+    padding:64px 24px 100px;
+  }
+  .record-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+    gap:16px;
+  }
+  .record-card{
+    position:relative;
+    display:block;
+    padding:24px 22px 18px;
+    border:1px solid rgba(255,255,255,0.08);
+    background:linear-gradient(160deg, rgba(122,21,25,0.05), rgba(255,255,255,0.015));
+    border-radius:3px;
+    transition:border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+  .record-card:hover{
+    border-color:rgba(224,73,47,0.5);
+    box-shadow:0 0 0 1px rgba(224,73,47,0.15), 0 16px 30px rgba(122,21,25,0.2);
+  }
+  .record-arrow{
+    position:absolute; top:16px; right:16px;
+    font-size:13px;
+    color:var(--fire-ember);
+    opacity:0.85;
+  }
+  .record-title{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:16px;
+    color:var(--ink);
+    padding-right:20px;
+    margin-bottom:10px;
+  }
+  .record-desc{
+    font-size:12.5px;
+    line-height:1.7;
+    color:var(--ink-dim);
+    margin-bottom:20px;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+  .record-foot{
+    font-size:10.5px;
+    color:var(--ink-faint);
+    letter-spacing:0.03em;
+    border-top:1px solid rgba(255,255,255,0.06);
+    padding-top:10px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .record-card .del-btn{
+    position:absolute; bottom:14px; right:14px;
+    background:transparent; border:1px solid rgba(255,255,255,0.15);
+    color:var(--ink-faint); font-size:10px;
+    padding:3px 8px; border-radius:2px;
+    display:none;
+  }
+  .record-card.admin-mode .del-btn{ display:inline-block; }
+  .record-card .edit-btn{
+    position:absolute; bottom:14px; right:58px;
+    background:transparent; border:1px solid rgba(255,255,255,0.15);
+    color:var(--ink-faint); font-size:10px;
+    padding:3px 8px; border-radius:2px;
+    display:none;
+  }
+  .record-card.admin-mode .edit-btn{ display:inline-block; }
+
+  .rec-add-panel{
+    max-width:560px;
+    margin:0 auto 44px;
+    padding:22px;
+    border:1px dashed rgba(169,184,202,0.35);
+    border-radius:3px;
+    background:rgba(169,184,202,0.03);
+  }
+
+  /* ===== Admin corner ===== */
+  .admin-corner{
+    position:fixed;
+    right:16px; bottom:16px;
+    z-index:500;
+    font-size:11px;
+  }
+  .admin-lock-btn{
+    background:rgba(10,8,12,0.7);
+    border:1px solid rgba(255,255,255,0.1);
+    color:var(--ink-faint);
+    padding:7px 12px;
+    border-radius:20px;
+    font-size:10.5px;
+    letter-spacing:0.04em;
+    opacity:0.55;
+    transition:opacity 0.3s ease, border-color 0.3s ease;
+  }
+  .admin-lock-btn:hover{ opacity:1; border-color:rgba(224,73,47,0.4); }
+  .admin-lock-btn.on{ opacity:1; color:var(--fire-ember); border-color:rgba(224,73,47,0.5); }
+  .admin-login-panel{
+    position:absolute;
+    bottom:44px; right:0;
+    width:220px;
+    background:rgba(8,6,10,0.96);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:4px;
+    padding:14px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.5);
+  }
+  .admin-login-panel[hidden]{ display:none; }
+  .admin-login-panel input{
+    width:100%;
+    background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,255,255,0.12);
+    color:var(--ink);
+    padding:8px 10px;
+    font-size:12px;
+    margin-bottom:10px;
+  }
+  .admin-login-panel .al-msg{
+    font-size:10.5px;
+    color:var(--fire-ember);
+    margin-bottom:8px;
+    min-height:12px;
+  }
+
+  /* ===== Footer ===== */
+  .footer{
+    text-align:center;
+    padding:52px 24px 60px;
+    background:var(--bg-void);
+    border-top:1px solid rgba(255,255,255,0.06);
+  }
+  .footer-mark{
+    font-family:var(--serif);
+    font-size:13px;
+    letter-spacing:0.4em;
+    color:var(--ink-faint);
+  }
+  .footer-sub{
+    margin-top:10px;
+    font-size:11px;
+    letter-spacing:0.1em;
+    color:#3a3a40;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 860px){
+    .split{ grid-template-columns:1fr; }
+    .seam{
+      height:56px;
+      background:linear-gradient(to right, var(--fire-dim), var(--ash-dim));
+    }
+    .seam::before{
+      background:repeating-linear-gradient(
+        to right,
+        rgba(224,73,47,0.5) 0px, rgba(224,73,47,0.5) 2px,
+        transparent 2px, transparent 14px
+      );
+    }
+    .side{ padding:48px 24px 72px; }
+    .kicker{ top:18px; left:18px; }
+    .hero{ padding:76px 20px 56px; }
+    .nav-tab{ padding:14px 12px 12px; font-size:11.5px; letter-spacing:0.08em; }
+    .episode-body{ padding-left:24px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .ember-particle, .landing-embers span{ animation:none; opacity:0.4; }
+  }
+
+  /* ===== Canvas ember background ===== */
+  #emberCanvas{
+    position:fixed;
+    inset:0;
+    width:100%; height:100%;
+    z-index:-1;
+    pointer-events:none;
+    opacity:0.65;
+  }
+
+  /* ===== Person filter (개인 서사) ===== */
+  .person-filter{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    padding:26px 16px 0;
+    position:relative;
+    z-index:1;
+  }
+  .filter-btn{
+    background:rgba(0,0,0,0.3);
+    border:1px solid rgba(255,255,255,0.14);
+    color:var(--ink-faint);
+    font-size:11.5px;
+    letter-spacing:0.08em;
+    padding:8px 18px;
+    border-radius:20px;
+    transition:color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .filter-btn:hover{ color:var(--ink-dim); border-color:rgba(255,255,255,0.3); }
+  .filter-btn.active[data-filter="all"]{ color:var(--ink); border-color:rgba(255,255,255,0.4); }
+  .filter-btn.active[data-filter="fire"]{ color:var(--fire-ember); border-color:rgba(224,73,47,0.55); box-shadow:0 0 14px rgba(224,73,47,0.28); }
+  .filter-btn.active[data-filter="ash"]{ color:var(--ash-glow); border-color:rgba(169,184,202,0.45); box-shadow:0 0 14px rgba(169,184,202,0.22); }
+
+  .split.filter-fire .side.ash,
+  .split.filter-fire .seam,
+  .split.filter-ash .side.fire,
+  .split.filter-ash .seam{
+    display:none;
+  }
+  .split.filter-fire,
+  .split.filter-ash{
+    grid-template-columns:1fr;
+  }
+
+  /* ===== BGM controller ===== */
+  .bgm-corner{
+    position:fixed;
+    right:16px; top:16px;
+    z-index:500;
+  }
+  .bgm-toggle-btn{
+    position:relative;
+    width:40px; height:40px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.16);
+    background:radial-gradient(circle at 35% 35%, #241014, #0a0508 72%);
+    color:var(--ink-faint);
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .bgm-toggle-btn::before{
+    content:'';
+    position:absolute; inset:8px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .bgm-toggle-btn::after{
+    content:'';
+    position:absolute;
+    top:5px; right:5px;
+    width:6px; height:6px;
+    border-radius:50%;
+    background:#3a3a40;
+    transition:background 0.3s ease, box-shadow 0.3s ease;
+  }
+  .bgm-toggle-btn.playing{ animation:vinyl-spin 3.4s linear infinite; color:var(--ink-dim); }
+  .bgm-toggle-btn.playing::after{
+    background:var(--fire-ember);
+    box-shadow:0 0 6px 2px rgba(224,73,47,0.75);
+  }
+  @keyframes vinyl-spin{ from{ transform:rotate(0deg);} to{ transform:rotate(360deg);} }
+
+  .bgm-panel{
+    position:absolute;
+    top:48px; right:0;
+    width:240px;
+    background:rgba(8,6,10,0.96);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:4px;
+    padding:14px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.5);
+  }
+  .bgm-panel[hidden]{ display:none; }
+  .bgm-panel label{
+    display:block;
+    font-size:10.5px;
+    letter-spacing:0.1em;
+    color:var(--ink-faint);
+    margin-bottom:6px;
+  }
+  .bgm-track-label{
+    font-size:9.5px;
+    letter-spacing:0.22em;
+    color:var(--ink-faint);
+    margin-bottom:6px;
+  }
+  .bgm-track-title{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:13.5px;
+    color:var(--ink);
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    min-height:18px;
+    line-height:1.4;
+  }
+  .bgm-btn-row{ display:flex; gap:6px; margin-bottom:12px; }
+  .bgm-btn-row .btn-ghost{ flex:1; font-size:10.5px; padding:8px 6px; text-align:center; }
+  .bgm-vol-row{ display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .bgm-vol-row input[type="range"]{ flex:1; accent-color:var(--fire-ember); }
+  .bgm-playlist{
+    list-style:none;
+    max-height:168px;
+    overflow-y:auto;
+    border-top:1px solid rgba(255,255,255,0.08);
+    padding-top:8px;
+  }
+  .bgm-playlist li{
+    font-size:11.5px;
+    color:var(--ink-faint);
+    padding:7px 8px;
+    border-radius:2px;
+    cursor:pointer;
+    transition:background 0.25s ease, color 0.25s ease;
+  }
+  .bgm-playlist li:hover{ background:rgba(255,255,255,0.05); color:var(--ink-dim); }
+  .bgm-playlist li.playing{
+    color:var(--fire-ember);
+    background:rgba(224,73,47,0.08);
+  }
+  .bgm-msg{ font-size:10px; color:var(--ink-faint); margin-top:8px; min-height:12px; }
+</style>
+</head>
+<body>
+
+  <canvas id="emberCanvas" aria-hidden="true"></canvas>
+
+  <!-- ===== LANDING GATE ===== -->
+  <section class="landing" id="landing">
+    <div class="landing-embers" aria-hidden="true">
+      <span style="left:22%; animation-delay:0s;"></span>
+      <span style="left:38%; animation-delay:1.4s;"></span>
+      <span style="left:55%; animation-delay:2.8s;"></span>
+      <span style="left:68%; animation-delay:0.7s;"></span>
+      <span style="left:80%; animation-delay:3.6s;"></span>
+      <span style="left:14%; animation-delay:4.4s;"></span>
+    </div>
+    <div class="hero">
+      <div class="hero-hanja">星雲</div>
+      <div class="hero-hangul">성운</div>
+      <div class="hero-divider"></div>
+      <div class="hero-sub"><span class="c-ember">재</span><span class="c-join">와</span><span class="c-ash">불씨</span></div>
+      <div class="hero-tagline">GEUM SEONGJE  ／  YEON ROWOON</div>
+    </div>
+    <div class="enter-wrap">
+      <button class="enter-btn" id="enterBtn">입장하기<span class="en">ENTER</span></button>
+    </div>
+    <div class="landing-hint">WEAK HERO ／ CLASS 2</div>
+  </section>
+
+  <!-- ===== MAIN SITE ===== -->
+  <div id="mainSite">
+
+    <nav class="site-nav">
+      <div class="nav-inner">
+        <button class="nav-tab active" data-tab="personal">개인 서사</button>
+        <button class="nav-tab" data-tab="combined">통합 서사</button>
+        <button class="nav-tab" data-tab="images">이미지</button>
+        <button class="nav-tab" data-tab="records">기록</button>
+      </div>
+    </nav>
+
+    <!-- ===== TAB: 개인 서사 ===== -->
+    <div class="tab-panel active" id="tab-personal">
+
+      <div class="kicker">WEAK HERO ／ CLASS 2</div>
+
+      <div class="person-filter">
+        <button class="filter-btn active" data-filter="all">전체 보기</button>
+        <button class="filter-btn" data-filter="fire">금성제만 보기</button>
+        <button class="filter-btn" data-filter="ash">연로운만 보기</button>
+      </div>
+
+      <div class="split">
+
+        <!-- ===== LEFT : 금성제 ===== -->
+        <div class="side fire">
+          <div class="name-block">
+            <div class="surname">GEUM SEONGJE</div>
+            <div class="charname">금성제</div>
+          </div>
+          <div class="meta-row">
+            <span>강학고등학교 2학년</span>
+            <span>18세</span>
+            <span>185cm</span>
+            <span class="accent">강학고 서열 1위</span>
+            <span>연합 前 No.2급</span>
+          </div>
+          <div class="quote-line">"만나서 반가워. 나 금성제, 이 씨발아."</div>
+
+          <div class="story-block">
+            <div class="story-head"><span class="story-mark">▸</span><span class="story-title">강학고에는 서열이 없다</span></div>
+            <div class="story-body">정확히 말하면, 서열을 다투는 놈들이 없다. <strong>금성제 하나로 끝났으므로.</strong> 그가 강학고 정문을 통과한 첫 주에 3학년 셋과 2학년 넷이 병원 신세를 졌고, 그 이후로 아무도 순번을 매기려 들지 않았다. 조직화된 위계가 잡힌 다른 주변 학교와 달리 강학고는 그냥 금성제와 나머지로 나뉘었고, 그 편이 성제에게 훨씬 편했다. 관리할 부하도, 지켜야 할 체면도 없이 하고 싶은 대로 굴 수 있었으니까.<br><br>연합 안에서도 그는 늘 이질적이었다. 나백진이 세운 연합의 논리는 명확했다 — 각 학교의 정점이 하나의 위계 안으로 편입되고, 이권과 공포로 유지되는 구조. 그러나 성제는 그 어떤 항목에도 진심으로 소속되지 않았다. 회의에 늦거나 아예 오지 않았고, 지시를 흘려듣고 제 판단대로 움직였으며, 그럼에도 백진이 내치지 않은 이유는 단순했다. <strong>너무 셌기 때문이다.</strong> 연합이라는 이름 아래서 성제는 언제나 형식적인 소속에 지나지 않았으며, 굳이 자리를 유지한 것은 소속감 때문이 아니라 그 판이 재미있었기 때문이었다.</div>
+          </div>
+
+          <div class="story-block">
+            <div class="story-head"><span class="story-mark">▸</span><span class="story-title">돈과 재미, 그 순서마저 유동적인</span></div>
+            <div class="story-body">성제의 행동 원리는 두 가지뿐이다. <strong>돈이 되는가, 재미있는가.</strong> 연합의 이권 사업에 가장 적극적이었던 것도 전자 때문이었고, 정작 회의 자리에서 가장 태만했던 것도 후자 때문이었다. 다만 그 둘이 충돌할 때 무엇을 택하느냐는 그날 기분에 달려 있었으므로, 그 누구도 그의 다음 행동을 예측하지 못했다.<br><br>그가 진심으로 혐오하는 유형은 딱 하나다. 강약약강. 아래를 짓밟으며 위에는 기는 놈. 연합 안에 그런 부류가 넘쳐났고, 성제는 회식 자리에서 몇 번이나 그런 놈들의 잔을 엎었다. 그러면서도 웃었다. <strong>웃으면서 사람을 패는 것이 성제의 방식</strong>이었으며, 그래서 더 무서웠다.</div>
+          </div>
+
+          <div class="story-block">
+            <div class="story-head"><span class="story-mark">▸</span><span class="story-title">그 싸움 방식이 만들어진 이유</span></div>
+            <div class="story-body">성제는 피하지 않는다. 상대의 주먹을 얼굴로 받아내고, 옆구리를 내주고, 그렇게 전부 흡수한 뒤에 상대가 지칠 때까지 밀어붙인다. 변칙적인 킥과 예측 불가능한 궤도로 상대의 계산을 무너뜨리고, 광전사처럼 굴복할 때까지 몰아붙인다.<br><br>맷집이 좋아서가 아니었다. 아픈 걸 별로 중요하게 생각하지 않았을 뿐이다. 통증은 그에게 정보이지 위협이 아니었으며, 그것은 성장 과정에서 학습된 결과였다. 집에서 매를 맞으며 자란 놈은 두 종류로 갈린다. 통증을 피하는 법을 배우거나, 통증이 별거 아니라고 결론짓거나. <strong>성제는 후자였다.</strong> 그는 그 사실을 누구에게도 말하지 않았고, 앞으로도 말할 생각이 없다.</div>
+          </div>
+
+          <div class="story-block">
+            <div class="story-head"><span class="story-mark">▸</span><span class="story-title">연시은이라는 오답 표</span></div>
+            <div class="story-body">연합 입장에서 연시은은 골칫거리였다. 체격은 형편없는데 급소를 정확히 노리고, 주변 사물을 무기로 쓰고, 이길 수 없는 판을 이길 수 있는 판으로 바꿔놓는다. 나백진은 그런 변수를 싫어했고, 처리 대상으로 분류했다.<br><br>성제는 정반대였다. 은장고 애들과 부딪힌 첫날, 골목에서 피 흘리며 일어나는 시은을 보고 그가 내린 결론은 하나였다.</div>
+            <div class="exchange">"하여간 은장 이 개새끼들, 존잼이라니까."</div>
+          </div>
+
+          <div class="story-block">
+            <div class="story-head"><span class="story-mark">▸</span><span class="story-title">그리고 형이 있다는 걸 알았을 때</span></div>
+            <div class="story-body">강학고 3학년 교실 창가, 이어폰 끼고 자는 유급생. 성제는 처음에 그를 완전히 무시했다. 서열에 관심 없고 연합 권유를 세 번이나 거절한 167cm의 무표정한 놈이 재미있을 리 없었으니까.<br><br><strong>착각이었다.</strong><br><br>시비를 걸어도 반응이 없었다. 몇 대 때리면 그냥 맞아줬고, 다음 날이면 아무 일 없었던 것처럼 또 자고 있었다. 화를 내지도, 겁을 먹지도, 도망치지도 않았다. 성제가 지금까지 만난 모든 인간이 보였던 반응 중 어느 것도 하지 않았다. 그 무반응이 성제를 미치게 만들었고, 그때부터 강학고에서 금성제의 유일한 일과는 연로운을 건드리는 일이 되었다.<br><br>그러다 알게 됐다. 그 새끼가 연시은의 형이라는 것을.<br><br>성제는 동생을 미끼로 던졌다. 로운이 리스크를 극도로 혐오하는 인간이라는 걸 이미 읽어냈으므로, 유일하게 계산을 무너뜨릴 수 있는 카드가 무엇인지도 알았다. 그리고 로운은 수락했다. 그 순간 성제가 느낀 것은 승리감이 아니었다.<br><br><strong>아, 이 새끼도 부술 수 있는 데가 있었네.</strong></div>
+          </div>
+        </div>
+
+        <!-- ===== SEAM ===== -->
+        <div class="seam" aria-hidden="true">
+          <div class="ember-particle" style="left:-3px; top:60%; animation-delay:0s;"></div>
+          <div class="ember-particle" style="left:1px; top:30%; animation-delay:1.8s;"></div>
+          <div class="ember-particle" style="left:-2px; top:80%; animation-delay:3.4s;"></div>
+          <div class="ember-particle smoke" style="left:0px; top:20%; animation-delay:0.9s;"></div>
+          <div class="ember-particle smoke" style="left:-1px; top:50%; animation-delay:2.6s;"></div>
+          <div class="ember-particle smoke" style="left:2px; top:70%; animation-delay:4.2s;"></div>
+        </div>
+
+        <!-- ===== RIGHT : 연로운 ===== -->
+        <div class="side ash">
+          <div class="name-block">
+            <div class="surname">YEON ROWOON</div>
+            <div class="charname">연로운</div>
+          </div>
+          <div class="meta-row">
+            <span>강학고등학교 2학년</span>
+            <span>19세</span>
+            <span class="accent">167cm</span>
+          </div>
+          <div class="quote-line">"필요 없으면 안 해."</div>
+
+          <div class="story-block">
+            <div class="story-head"><span class="story-mark">▸</span><span class="story-title">이어폰을 낀 유급생</span></div>
+            <div class="story-body">교실 창가 두 번째 줄, 매일 같은 자리에서 자는 애가 있다. 출석 일수는 매달 아슬아슬하게 미달을 면하고, 그런데 모의고사는 전교 5등 밖으로 나간 적이 없다. 담임은 처음 한 학기 동안 그를 이해하려 애썼고, 두 번째 학기부터는 포기했다. 성적이 나오는 학생에게 학교가 요구할 게 뭐가 더 있겠는가.<br><br><strong>공부는 목표가 아니라 수단이었다.</strong> 성적이 상위권이면 교사가 간섭하지 않고, 간섭이 없으면 학교에 있는 시간이 조용해진다. 로운은 그 계산을 중학교 때 이미 끝냈으며, 이후로 단 한 번도 방식을 바꾸지 않았다.</div>
+          </div>
+
+          <div class="story-block">
+            <div class="story-head"><span class="story-mark">▸</span><span class="story-title">시은에게 형이라는 것</span></div>
+            <div class="story-body">한 살 아래 동생은 자기와 정반대로 자랐다. 정의감이 있고 물러서지 않고, 옳다고 판단하면 계산을 접는다. 로운은 그게 언젠가 시은을 부술 것이라고 오래전부터 알고 있었으나 한 번도 말한 적은 없다. 말해서 바뀌는 종류의 인간이 아니었으므로.<br><br>형제의 대화는 하루 열 문장을 넘기지 않는다. 밥 먹었냐, 어, 늦게 와, 알았어. 그럼에도 서로에 대한 해석은 어긋난 적이 없다. <strong>시은은 형이 무관심한 척하는 걸 알고, 로운은 동생이 괜찮은 척하는 걸 안다.</strong> 둘 다 그 사실을 확인하지 않는다.</div>
+          </div>
+
+          <div class="story-block">
+            <div class="story-head"><span class="story-mark">▸</span><span class="story-title">안수호의 이름을 아는 방식</span></div>
+            <div class="story-body">안수호를 몇 번 봤다. 동생을 데리러 벽산고 앞에 갔을 때, 집에 놀러 왔을 때, 편의점 앞에서 우연히 마주쳤을 때. 웃음이 헤프고 목소리가 큰 애였다. 로운은 그런 유형을 피곤해했으나 시은 옆에 있을 때 시은의 표정이 달라지는 걸 봤으므로, 나쁘게 평가하지 않았다.<br><br>촉이 안좋았던 날, 수호는 로운에게 먼저 이야기를 꺼냈다. 혼자 끝내고 올테니 시은에게 말하지 말아달라는 얘기. 약속대로 로운은 동생에게 수호의 행방에 대해 말하지 않았다. 다만, 그의 뒤를 따라갔을 뿐. 기억나는 건 드물다. 뒤늦게 주먹이 허공을 가르던 느낌. 안수호가 병원에 실려가던 뒷모습.<br><br><strong>그리고 불타는 복싱장 아래 상처투성이로 남아있던 자신의 모습.</strong></div>
+          </div>
+
+          <div class="story-block">
+            <div class="story-head"><span class="story-mark">▸</span><span class="story-title">병실에서 잃어버린 1년</span></div>
+            <div class="story-body">유급의 이유는 병원이었다. 열여덟의 늦여름. 동생을 대신하여 끝내려는 무모한 생각이 그를 뒤늦게 불태웠다. 목부터 상체 전반에 큰 화상을 입고, 몇 달 동안 입원하여 치료를 받았다.<br><br>퇴원 후 출석 일수는 이미 회복 불가능했다. 재수 대신 유급을 택한 것도 계산의 결과였다. 재수는 1년의 리스크를 통째로 지는 일이고 유급은 어차피 있어야 할 학교에 1년 더 있는 일이므로, 후자가 명백히 저렴했다.<br><br>그 몇 달 동안 병실 침대에 누워 배운 건 하나였다. <strong>몸이 무너지면 아무것도 통제할 수 없다.</strong> 그때부터 로운은 리스크를 극도로 혐오하게 됐다.</div>
+            <div class="exchange">
+              "형이 알 거 없다고 하면 나 그냥 안 물어봤어. 예전엔."<br>
+              "근데 수호도 나한테 그랬어. 알 거 없다고. 그 다음 주에 그렇게 됐고. 그리고 형도."
+              <span class="who">— 연시은</span>
+            </div>
+          </div>
+
+          <div class="story-block">
+            <div class="story-head"><span class="story-mark">▸</span><span class="story-title">연합을 거절한 이유</span></div>
+            <div class="story-body">나백진에게서 권유를 세 번 받았다. 실력을 정확히 읽는 눈을 가진 놈이었으므로, 로운의 방어·회피 중심 스타일과 상대의 버릇을 학습해 카운터를 꽂는 방식이 얼마나 성가신지 알아봤다. 로운은 세 번 모두 거절했다.<br><br>이유는 단순하다. <strong>소속은 의무를 만들고, 의무는 리스크를 만든다.</strong> 서열도 자존심도 로운에게는 지불할 가치가 없는 항목이었으며, 그 무관심이 오히려 나백진을 불쾌하게 만들었다. 통제되지 않는 변수를 좋아하는 권력자는 없다.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== TAB: 통합 서사 ===== -->
+    <div class="tab-panel" id="tab-combined">
+      <div class="combined-wrap">
+        <div class="combined-intro">
+          <div class="ci-mark">交 錯</div>
+          <h2>얽히는 지점들</h2>
+          <p>두 사람이 각자의 서사를 벗어나 같은 장면 안에 놓이는 순간들.<br>제목 옆 뱃지를 눌러 펼쳐볼 것.</p>
+        </div>
+
+        <div class="episode" data-badge="fire">
+          <button class="episode-header">
+            <span class="ep-badge">火</span>
+            <span class="ep-num">01</span>
+            <span class="ep-title">강학고에서의 재회<span class="ep-sub">이어폰과 무반응</span></span>
+            <span class="ep-arrow">▼</span>
+          </button>
+          <div class="episode-body-outer">
+            <div class="episode-body">
+              <div class="story-body">3학년 교실 창가, 이어폰을 끼고 자는 유급생이 있다는 소문은 성제도 들었다. 서열에 관심 없고 연합 권유를 세 번 거절했다는 그 이야기가 딱히 흥미롭지는 않았다. 다만 심심했고, 심심할 때 성제가 하는 일은 정해져 있었다.<br><br>책상을 걷어차도, 어깨를 밀어도, 이어폰을 뽑아던져도 반응은 같았다. 눈을 뜨고, 성제를 한 번 보고, 도로 감는다. <strong>화도 겁도 없이.</strong> 성제가 지금껏 만난 모든 인간이 보였던 반응 목록에 없는 항목이었다.</div>
+              <div class="exchange">
+                "야. 너 내가 누군지 알아?"<br>
+                "몰라. 알아야 돼?"
+                <span class="who">— 금성제 / 연로운</span>
+              </div>
+              <div class="story-body" style="margin-top:20px;">그날 이후 성제의 유일한 일과가 하나 늘었다. 반응 없는 인간의 반응을 끌어내는 것. 매일 실패했고, 매일 다시 시도했다.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="episode" data-badge="ash">
+          <button class="episode-header">
+            <span class="ep-badge">灰</span>
+            <span class="ep-num">02</span>
+            <span class="ep-title">흉터라는 소유물<span class="ep-sub">몸엔 새겨졌고, 시선은 매달렸다</span></span>
+            <span class="ep-arrow">▼</span>
+          </button>
+          <div class="episode-body-outer">
+            <div class="episode-body">
+              <div class="story-body">2024년 여름. 연로운은 가끔 그날의 꿈을 꾼다.<br><br>불타는 복싱장 한가운데. 타는 냄새와 피 냄새가 뒤섞인 공기. 그 한복판에 상처투성이인 채 버려져 있던 자신. 꿈은 늘 거기에서 끝난다. 누가 자신을 구했는지, 어떻게 병원까지 갔는지는 빠져 있다. <strong>지옥은 끝나는 순간보다 남겨지는 순간을 더 오래 기억하는 법이었다.</strong> 몇 달의 입원과 퇴원. 한 학기를 병원에서 보냈다.<br><br>로운은 그 시간을 인생의 커다란 흠이라고 생각한 적이 없었다. 그냥 있었다. 비가 한 번 왔다 간 것처럼, 뼈가 부러졌다 붙은 것처럼. 몸은 흉터를 남겼고, 시간은 지나갔다. 그게 전부였다. 하지만 세상은 그 흉터를 자기들 소유처럼 다뤘다.<br><br>어딜 가든 시선이 먼저 달라붙었다. 이름도 모르는 인간들이 아무렇지도 않게 물었다. 무슨 일이 있었냐고. 많이 힘들었겠다고. 아직도 괴롭냐고. 그 질문들은 전부 같은 얼굴을 하고 있었다. 흉터가 있으면 불행해야 한다는 얼굴. 불행해야 자기들의 위로가 의미를 가진다고 믿는 얼굴. <strong>제 상처를 들춰내는 게 다정함이라고 착각하는, 흔한 병신 같은 망상.</strong><br><br>로운은 흉터를 굳이 가릴 생각은 없었다. 가린다고 없던 일이 되는 것도 아니었고, 드러낸다고 특별해지는 것도 아니었다. 다만 가끔은 귀찮았다. 목을 쓸어내릴 때마다 시선이 따라 움직이는 게. 남들은 흉터를 보고 사건을 상상했지만, 정작 로운은 아무것도 떠올리지 않았다.<br><br><strong>기억보다 시선이 더 질겼다.</strong> 그게 가끔은, 불보다 더 짜증 났다.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="episode" data-badge="fire">
+          <button class="episode-header">
+            <span class="ep-badge">火</span>
+            <span class="ep-num">03</span>
+            <span class="ep-title">연시은이라는 미끼<span class="ep-sub">계산을 무너뜨리는 유일한 변수</span></span>
+            <span class="ep-arrow">▼</span>
+          </button>
+          <div class="episode-body-outer">
+            <div class="episode-body">
+              <div class="story-body">로운이 리스크를 혐오한다는 걸 읽어낸 순간, 성제는 그를 무너뜨릴 유일한 지렛대가 무엇인지도 함께 읽어냈다. 은장고와의 마찰에 시은의 이름을 슬쩍 얹었을 뿐인데, 언제나 무반응이던 상대가 처음으로 계산이 아닌 대답을 내놓았다.</div>
+              <div class="exchange">
+                "네 동생 오늘 은장고 쪽 애들이랑 붙었다던데."<br>
+                "……어디서."<br>
+                "가르쳐주면 나랑 뭐 하나 하는 거다."
+                <span class="who">— 금성제 / 연로운</span>
+              </div>
+              <div class="story-body" style="margin-top:20px;">로운은 조건을 듣지도 않고 수락했다. 성제가 그 순간 느낀 건 승리감이 아니라 <strong>발견</strong>에 가까웠다. 아, 이 새끼도 부술 수 있는 데가 있었네.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="episode" data-badge="ash">
+          <button class="episode-header">
+            <span class="ep-badge">灰</span>
+            <span class="ep-num">04</span>
+            <span class="ep-title">진단서와 라이터<span class="ep-sub">처음으로 이름을 부른 순간</span></span>
+            <span class="ep-arrow">▼</span>
+          </button>
+          <div class="episode-body-outer">
+            <div class="episode-body">
+              <div class="story-body">로운의 가방에서 흘러나온 서류를 주운 건 우연이었다. 화상 진단서. 성제는 별생각 없이 라이터를 꺼내 종이 끝에 불을 붙였다. 반응을 보고 싶었을 뿐이다. 늘 그랬듯이.<br><br>이번에는 달랐다. 숨이 먼저 헐떡였고, 그다음 로운이 성제를 밀쳤다. 있는 힘껏, 처음으로. 발로 종이를 밟아 불을 끄는 손이 눈에 띄게 떨리고 있었다.</div>
+              <div class="exchange">
+                "금성제, 이 미친 새끼야."<br>
+                "……"
+                <span class="who">— 연로운 / 금성제</span>
+              </div>
+              <div class="story-body" style="margin-top:20px;">성제에게 이름으로 불린 건 그때가 처음이었다. 웃음기가 사라진 얼굴로, 그가 목소리를 낮춰 말했다.</div>
+              <div class="exchange">"내 앞에서 그 흉터 가리기만 해 봐."<span class="who">— 금성제</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== TAB: 이미지 ===== -->
+    <div class="tab-panel" id="tab-images">
+      <div class="images-wrap">
+        <div class="section-heading">
+          <div class="sh-mark">畵</div>
+          <h2>이미지 아카이브</h2>
+        </div>
+
+        <div class="img-upload-panel" id="imgUploadPanel" hidden>
+          <label>이미지 파일 (이 브라우저에만 보이는 임시 미리보기)</label>
+          <input type="file" id="imgFileInput" accept="image/*">
+          <label>또는 이미지 URL (GitHub 등에 올린 주소 — 내보내기에 바로 포함됨)</label>
+          <input type="text" id="imgUrlInput" placeholder="https://raw.githubusercontent.com/...">
+          <label>커미션주 닉네임 / 출처</label>
+          <input type="text" id="imgNickInput" placeholder="예: @artist_name">
+          <button class="btn-solid" id="imgUploadBtn">추가</button>
+          <div class="publish-hint">여기서 추가한 항목은 이 브라우저에만 보이는 <strong>초안(DRAFT)</strong>입니다. 다른 사람에게도 보이게 하려면 아래에서 JSON을 내보내 data.js에 반영해주세요.</div>
+          <button class="btn-ghost" id="imgExportBtn" style="width:100%;">🔗 공유용 JSON 내보내기</button>
+          <div class="export-box" id="imgExportBox" hidden>
+            <textarea id="imgExportText" readonly rows="8"></textarea>
+            <button class="btn-solid" id="imgExportCopyBtn" style="width:100%;">복사하기</button>
+            <div class="export-note">이 배열을 GitHub의 data.js 안 window.SEONGUN_SHARED_DATA.images 값으로 붙여넣고 커밋하면 모든 방문자에게 공개됩니다.</div>
+          </div>
+        </div>
+
+        <div class="img-grid" id="imgGrid"></div>
+        <div class="empty-note" id="imgEmptyNote">아직 등록된 이미지가 없습니다.</div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: 기록 ===== -->
+    <div class="tab-panel" id="tab-records">
+      <div class="records-wrap">
+        <div class="section-heading">
+          <div class="sh-mark">記</div>
+          <h2>기록 보관소</h2>
+        </div>
+
+        <div class="rec-add-panel" id="recAddPanel" hidden>
+          <label style="display:block;font-size:11px;letter-spacing:0.14em;color:var(--ink-faint);margin-bottom:6px;">타이틀</label>
+          <div class="field-row"><input type="text" id="recTitleInput" placeholder="글 제목"></div>
+          <label style="display:block;font-size:11px;letter-spacing:0.14em;color:var(--ink-faint);margin-bottom:6px;">요약 설명</label>
+          <div class="field-row"><textarea id="recDescInput" rows="2" placeholder="한두 줄 요약"></textarea></div>
+          <label style="display:block;font-size:11px;letter-spacing:0.14em;color:var(--ink-faint);margin-bottom:6px;">외부 URL</label>
+          <div class="field-row"><input type="url" id="recUrlInput" placeholder="https://"></div>
+          <label style="display:block;font-size:11px;letter-spacing:0.14em;color:var(--ink-faint);margin-bottom:6px;">작성자 닉네임</label>
+          <div class="field-row"><input type="text" id="recAuthorInput" placeholder="예: @author_name"></div>
+          <button class="btn-solid" id="recAddBtn">기록 추가</button>
+          <div class="publish-hint">여기서 추가한 항목은 이 브라우저에만 보이는 <strong>초안(DRAFT)</strong>입니다. 다른 사람에게도 보이게 하려면 아래에서 JSON을 내보내 data.js에 반영해주세요.</div>
+          <button class="btn-ghost" id="recExportBtn" style="width:100%;">🔗 공유용 JSON 내보내기</button>
+          <div class="export-box" id="recExportBox" hidden>
+            <textarea id="recExportText" readonly rows="8"></textarea>
+            <button class="btn-solid" id="recExportCopyBtn" style="width:100%;">복사하기</button>
+            <div class="export-note">이 배열을 GitHub의 data.js 안 window.SEONGUN_SHARED_DATA.records 값으로 붙여넣고 커밋하면 모든 방문자에게 공개됩니다.</div>
+          </div>
+        </div>
+
+        <div class="record-grid" id="recordGrid"></div>
+        <div class="empty-note" id="recEmptyNote">아직 등록된 기록이 없습니다.</div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-mark">星 雲</div>
+      <div class="footer-sub">GEUM SEONGJE  ×  YEON ROWOON</div>
+    </footer>
+
+  </div>
+
+  <!-- ===== BGM CONTROLLER ===== -->
+  <div class="bgm-corner">
+    <button class="bgm-toggle-btn" id="bgmToggleBtn" title="Ambient BGM">♪</button>
+    <div class="bgm-panel" id="bgmPanel" hidden>
+      <div class="bgm-track-label">NOW PLAYING</div>
+      <div class="bgm-track-title" id="bgmTrackTitle">트랙을 선택하세요</div>
+      <div class="bgm-btn-row">
+        <button class="btn-ghost" id="bgmPrevBtn">◀ 이전</button>
+        <button class="btn-ghost" id="bgmPlayBtn">▶ 재생</button>
+        <button class="btn-ghost" id="bgmNextBtn">다음 ▶</button>
+      </div>
+      <div class="bgm-vol-row">
+        <label style="margin-bottom:0;">Vol</label>
+        <input type="range" id="bgmVolInput" min="0" max="1" step="0.01" value="0.5">
+      </div>
+      <ul class="bgm-playlist" id="bgmPlaylist"></ul>
+      <div class="bgm-msg" id="bgmMsg"></div>
+    </div>
+    <audio id="bgmAudio"></audio>
+  </div>
+
+  <!-- ===== ADMIN CORNER ===== -->
+  <div class="admin-corner">
+    <button class="admin-lock-btn" id="adminLockBtn">🔒 Admin / Upload</button>
+    <div class="admin-login-panel" id="adminLoginPanel" hidden>
+      <div class="al-msg" id="adminMsg"></div>
+      <input type="password" id="adminPassInput" placeholder="비밀번호">
+      <button class="btn-solid" id="adminSubmitBtn" style="width:100%;">확인</button>
+    </div>
+  </div>
+
+  <!-- ===== LIGHTBOX ===== -->
+  <div class="lightbox-overlay" id="lightbox" hidden>
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+    <img id="lightboxImg" src="" alt="">
+  </div>
+
+<script>
+(function(){
+  'use strict';
+
+  /* -------- 관리자 비밀번호 : 배포 전 반드시 변경할 것 -------- */
+  var ADMIN_PASSWORD = '143mm';
+  var isAdmin = false;
+
+  /* -------- 공유 데이터(JS) 설정 --------
+     이미지/기록을 다른 방문자에게도 보여주려면, GitHub 등에 아래와 같은
+     내용의 data.js 파일(확장자는 .js!)을 올리고 raw URL을 SHARED_DATA_URL에 넣어주세요.
+
+     window.SEONGUN_SHARED_DATA = {
+       "images": [
+         { "id": "img_001", "data": "https://raw.githubusercontent.com/.../sample.png", "nick": "@artist_name" }
+       ],
+       "records": [
+         { "id": "rec_001", "title": "글 제목", "desc": "요약", "url": "https://...", "author": "@author_name" }
+       ]
+     };
+
+     (neocities 등 일부 무료 호스팅은 보안 정책(CSP)상 fetch()로 다른 도메인에
+     접속하는 걸 막아둬서, data.json을 fetch로 불러오는 방식은 동작하지 않아요.
+     대신 <script> 태그로 외부 JS 파일을 불러오는 방식은 대부분 막지 않으므로,
+     여기서는 JSON이 아니라 위 형태의 JS 파일을 <script>로 동적 삽입해서 읽어옵니다.)
+
+     관리자가 로그인 후 이미지/기록을 추가·수정·삭제하면 이 브라우저 안에만
+     "임시(초안)" 상태로 저장됩니다. 다른 사람에게도 보이게 하려면 각 탭의
+     "공유용 JSON 내보내기" 버튼으로 최신 배열을 복사해 data.js의 해당 키
+     ("images" 또는 "records") 안에 붙여넣고 GitHub에 커밋해주세요. */
+  var SHARED_DATA_URL = 'https://raw.githubusercontent.com/H-a-ruuu/mp3/main/data.js';
+  var SHARED_IMAGES = [];
+  var SHARED_RECORDS = [];
+
+  function fetchSharedData(){
+    if(!SHARED_DATA_URL || SHARED_DATA_URL.indexOf('USERNAME/REPO') !== -1){
+      renderImages();
+      renderRecords();
+      return;
+    }
+    var script = document.createElement('script');
+    script.src = SHARED_DATA_URL;
+    script.onload = function(){
+      var data = window.SEONGUN_SHARED_DATA || {};
+      SHARED_IMAGES = data.images || [];
+      SHARED_RECORDS = data.records || [];
+      renderImages();
+      renderRecords();
+    };
+    script.onerror = function(){
+      SHARED_IMAGES = [];
+      SHARED_RECORDS = [];
+      renderImages();
+      renderRecords();
+    };
+    document.head.appendChild(script);
+  }
+
+  /* -------- 랜딩 게이트 -------- */
+  var landing = document.getElementById('landing');
+  var enterBtn = document.getElementById('enterBtn');
+  var mainSite = document.getElementById('mainSite');
+  enterBtn.addEventListener('click', function(){
+    landing.classList.add('leaving');
+    setTimeout(function(){
+      landing.style.display = 'none';
+    }, 950);
+    mainSite.scrollIntoView({behavior:'instant', block:'start'});
+  });
+
+  /* -------- 탭 네비게이션 -------- */
+  var tabs = document.querySelectorAll('.nav-tab');
+  var panels = document.querySelectorAll('.tab-panel');
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){ t.classList.remove('active'); });
+      panels.forEach(function(p){ p.classList.remove('active'); });
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      window.scrollTo({top:0, behavior:'smooth'});
+    });
+  });
+
+  /* -------- 인물 필터 (개인 서사) -------- */
+  var filterBtns = document.querySelectorAll('.filter-btn');
+  var splitEl = document.querySelector('.split');
+  filterBtns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      filterBtns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      splitEl.classList.remove('filter-fire', 'filter-ash');
+      var f = btn.dataset.filter;
+      if(f === 'fire') splitEl.classList.add('filter-fire');
+      if(f === 'ash') splitEl.classList.add('filter-ash');
+    });
+  });
+
+  /* -------- 캔버스 앰버 이펙트 -------- */
+  (function(){
+    var canvas = document.getElementById('emberCanvas');
+    var ctx = canvas.getContext('2d');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var particles = [];
+    var COUNT = 60;
+
+    function resize(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function makeParticle(spawnAnywhere){
+      var isEmber = Math.random() < 0.6;
+      return {
+        x: Math.random() * canvas.width,
+        y: spawnAnywhere ? Math.random() * canvas.height : canvas.height + Math.random() * 80,
+        r: isEmber ? (1 + Math.random() * 1.6) : (1.4 + Math.random() * 2),
+        speed: 0.14 + Math.random() * 0.32,
+        drift: (Math.random() - 0.5) * 0.28,
+        life: 0,
+        fadeIn: 50 + Math.random() * 60,
+        totalLife: 480 + Math.random() * 420,
+        maxAlpha: isEmber ? (0.32 + Math.random() * 0.32) : (0.14 + Math.random() * 0.18),
+        alpha: 0,
+        color: isEmber ? '224,73,47' : '169,184,202'
+      };
+    }
+
+    for(var i = 0; i < COUNT; i++){ particles.push(makeParticle(true)); }
+
+    function drawStatic(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(function(p){
+        var a = p.maxAlpha * 0.5;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + p.color + ',' + a + ')';
+        ctx.fill();
+      });
+    }
+
+    function tick(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(function(p){
+        p.life++;
+        p.y -= p.speed;
+        p.x += p.drift;
+
+        if(p.life < p.fadeIn){ p.alpha = p.maxAlpha * (p.life / p.fadeIn); }
+        else if(p.life > p.totalLife - 60){ p.alpha = p.maxAlpha * Math.max(0, (p.totalLife - p.life) / 60); }
+        else { p.alpha = p.maxAlpha; }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + p.color + ',' + p.alpha + ')';
+        ctx.shadowColor = 'rgba(' + p.color + ',0.85)';
+        ctx.shadowBlur = p.r * 3;
+        ctx.fill();
+
+        if(p.life > p.totalLife || p.y < -20){
+          var fresh = makeParticle(false);
+          for(var k in fresh){ p[k] = fresh[k]; }
+        }
+      });
+      requestAnimationFrame(tick);
+    }
+
+    if(reduceMotion){ drawStatic(); }
+    else { requestAnimationFrame(tick); }
+  })();
+
+  /* -------- BGM 플레이리스트 -------- */
+  (function(){
+    var PLAYLIST = [
+      { title: '겸 - 영원회귀', url: 'https://github.com/H-a-ruuu/mp3/raw/main/%EC%98%81%EC%9B%90%ED%9A%8C%EA%B7%80.mp3' },
+      { title: '2단지 - 유성', url: 'https://github.com/H-a-ruuu/mp3/raw/main/Meteor.mp3' },
+      { title: '도시 - 얼굴', url: 'https://github.com/H-a-ruuu/mp3/raw/main/face.mp3' },
+      { title: 'TOIL - 아무래도', url: 'https://github.com/H-a-ruuu/mp3/raw/main/anyhow.mp3' },
+      { title: 'Switcbak - 몽상', url: 'https://github.com/H-a-ruuu/mp3/raw/main/ahdtkd.mp3' },
+      { title: '소년:달 - 폭우', url: 'https://github.com/H-a-ruuu/mp3/raw/main/Heavy%20rain.mp3' }
+    ];
+
+    var toggleBtn = document.getElementById('bgmToggleBtn');
+    var panel = document.getElementById('bgmPanel');
+    var trackTitleEl = document.getElementById('bgmTrackTitle');
+    var playlistEl = document.getElementById('bgmPlaylist');
+    var playBtn = document.getElementById('bgmPlayBtn');
+    var prevBtn = document.getElementById('bgmPrevBtn');
+    var nextBtn = document.getElementById('bgmNextBtn');
+    var volInput = document.getElementById('bgmVolInput');
+    var msg = document.getElementById('bgmMsg');
+    var audio = document.getElementById('bgmAudio');
+
+    var currentIndex = -1;
+    audio.volume = parseFloat(volInput.value);
+
+    PLAYLIST.forEach(function(track, idx){
+      var li = document.createElement('li');
+      li.textContent = track.title;
+      li.addEventListener('click', function(){
+        loadTrack(idx, true);
+      });
+      playlistEl.appendChild(li);
+    });
+
+    function highlightPlaylist(){
+      var items = playlistEl.querySelectorAll('li');
+      items.forEach(function(li, idx){
+        li.classList.toggle('playing', idx === currentIndex);
+      });
+    }
+
+    function loadTrack(idx, autoplay){
+      currentIndex = (idx + PLAYLIST.length) % PLAYLIST.length;
+      var track = PLAYLIST[currentIndex];
+      audio.src = track.url;
+      trackTitleEl.textContent = track.title;
+      highlightPlaylist();
+      msg.textContent = '';
+      if(autoplay){
+        audio.play().then(function(){
+          toggleBtn.classList.add('playing');
+          playBtn.textContent = '❚❚ 일시정지';
+        }).catch(function(){
+          msg.textContent = '재생할 수 없는 트랙입니다.';
+          toggleBtn.classList.remove('playing');
+        });
+      }
+    }
+
+    toggleBtn.addEventListener('click', function(){
+      panel.hidden = !panel.hidden;
+    });
+
+    playBtn.addEventListener('click', function(){
+      if(currentIndex === -1){
+        loadTrack(0, true);
+        return;
+      }
+      if(audio.paused){
+        audio.play().then(function(){
+          toggleBtn.classList.add('playing');
+          playBtn.textContent = '❚❚ 일시정지';
+        }).catch(function(){
+          msg.textContent = '재생할 수 없는 트랙입니다.';
+        });
+      } else {
+        audio.pause();
+        toggleBtn.classList.remove('playing');
+        playBtn.textContent = '▶ 재생';
+      }
+    });
+
+    prevBtn.addEventListener('click', function(){
+      var target = currentIndex === -1 ? 0 : currentIndex - 1;
+      loadTrack(target, true);
+    });
+
+    nextBtn.addEventListener('click', function(){
+      var target = currentIndex === -1 ? 0 : currentIndex + 1;
+      loadTrack(target, true);
+    });
+
+    audio.addEventListener('ended', function(){
+      loadTrack(currentIndex + 1, true);
+    });
+
+    volInput.addEventListener('input', function(){
+      audio.volume = parseFloat(volInput.value);
+    });
+  })();
+
+  /* -------- 통합 서사 아코디언 -------- */
+  document.querySelectorAll('.episode-header').forEach(function(header){
+    header.addEventListener('click', function(){
+      var episode = header.closest('.episode');
+      var body = episode.querySelector('.episode-body-outer');
+      var isOpen = episode.classList.contains('open');
+      if(isOpen){
+        episode.classList.remove('open');
+        body.style.maxHeight = null;
+      } else {
+        episode.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 'px';
+      }
+    });
+  });
+
+  /* -------- 관리자 인증 -------- */
+  var adminLockBtn = document.getElementById('adminLockBtn');
+  var adminLoginPanel = document.getElementById('adminLoginPanel');
+  var adminPassInput = document.getElementById('adminPassInput');
+  var adminSubmitBtn = document.getElementById('adminSubmitBtn');
+  var adminMsg = document.getElementById('adminMsg');
+
+  adminLockBtn.addEventListener('click', function(){
+    if(isAdmin) return;
+    adminLoginPanel.hidden = !adminLoginPanel.hidden;
+    if(!adminLoginPanel.hidden) adminPassInput.focus();
+  });
+
+  function trySubmitAdmin(){
+    if(adminPassInput.value === ADMIN_PASSWORD){
+      isAdmin = true;
+      adminLockBtn.classList.add('on');
+      adminLockBtn.textContent = '🔓 Admin ON';
+      adminLoginPanel.hidden = true;
+      document.getElementById('imgUploadPanel').hidden = false;
+      document.getElementById('recAddPanel').hidden = false;
+      renderImages();
+      renderRecords();
+    } else {
+      adminMsg.textContent = '비밀번호가 올바르지 않습니다.';
+      adminPassInput.value = '';
+    }
+  }
+  adminSubmitBtn.addEventListener('click', trySubmitAdmin);
+  adminPassInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter') trySubmitAdmin();
+  });
+
+  /* -------- 이미지 갤러리 -------- */
+  var IMG_DRAFTS_KEY = 'seongun_gallery_drafts_v1';
+  var IMG_OVERRIDES_KEY = 'seongun_gallery_overrides_v1';
+  var IMG_HIDDEN_KEY = 'seongun_gallery_hidden_v1';
+  var imgGrid = document.getElementById('imgGrid');
+  var imgEmptyNote = document.getElementById('imgEmptyNote');
+  var imgFileInput = document.getElementById('imgFileInput');
+  var imgUrlInput = document.getElementById('imgUrlInput');
+  var imgNickInput = document.getElementById('imgNickInput');
+  var imgUploadBtn = document.getElementById('imgUploadBtn');
+  var imgExportBtn = document.getElementById('imgExportBtn');
+  var imgExportBox = document.getElementById('imgExportBox');
+  var imgExportText = document.getElementById('imgExportText');
+  var imgExportCopyBtn = document.getElementById('imgExportCopyBtn');
+
+  function loadJSON(key, fallback){
+    try{ return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+    catch(e){ return fallback; }
+  }
+  function saveJSON(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }
+    catch(e){ alert('저장 공간이 부족합니다.'); }
+  }
+
+  function loadImageDrafts(){ return loadJSON(IMG_DRAFTS_KEY, []); }
+  function saveImageDrafts(list){ saveJSON(IMG_DRAFTS_KEY, list); }
+  function loadImageOverrides(){ return loadJSON(IMG_OVERRIDES_KEY, {}); }
+  function saveImageOverrides(obj){ saveJSON(IMG_OVERRIDES_KEY, obj); }
+  function loadImageHidden(){ return loadJSON(IMG_HIDDEN_KEY, []); }
+  function saveImageHidden(list){ saveJSON(IMG_HIDDEN_KEY, list); }
+
+  function getMergedImages(){
+    var hidden = loadImageHidden();
+    var overrides = loadImageOverrides();
+    var published = SHARED_IMAGES
+      .filter(function(i){ return hidden.indexOf(i.id) === -1; })
+      .map(function(i){
+        var ov = overrides[i.id];
+        var merged = { id: i.id, data: i.data, nick: i.nick, published: true };
+        if(ov){ merged.nick = ov.nick; }
+        return merged;
+      });
+    var drafts = loadImageDrafts().map(function(i){
+      return { id: i.id, data: i.data, nick: i.nick, published: false };
+    });
+    return drafts.concat(published);
+  }
+
+  function renderImages(){
+    var list = getMergedImages();
+    imgGrid.innerHTML = '';
+    imgEmptyNote.style.display = list.length ? 'none' : 'block';
+    list.forEach(function(item){
+      var card = document.createElement('div');
+      card.className = 'img-card' + (isAdmin ? ' admin-mode' : '');
+      var img = document.createElement('img');
+      img.className = 'thumb';
+      img.src = item.data;
+      img.alt = item.nick || '';
+      img.addEventListener('click', function(){
+        openLightbox(item.data);
+      });
+      var cap = document.createElement('div');
+      cap.className = 'cap';
+      cap.textContent = 'Art by. ' + (item.nick || '익명') + (item.nick ? ' / Commission' : '');
+      if(!item.published){
+        var badge = document.createElement('span');
+        badge.className = 'draft-badge';
+        badge.textContent = 'DRAFT';
+        card.appendChild(badge);
+      }
+      var edit = document.createElement('button');
+      edit.className = 'edit-btn';
+      edit.textContent = '✎';
+      edit.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        var newNick = prompt('커미션주 닉네임 / 출처 수정', item.nick || '');
+        if(newNick === null) return;
+        if(item.published){
+          var overrides = loadImageOverrides();
+          overrides[item.id] = { nick: newNick.trim() };
+          saveImageOverrides(overrides);
+        } else {
+          var drafts = loadImageDrafts();
+          var target = drafts.find(function(i){ return i.id === item.id; });
+          if(target) target.nick = newNick.trim();
+          saveImageDrafts(drafts);
+        }
+        renderImages();
+      });
+      var del = document.createElement('button');
+      del.className = 'del-btn';
+      del.textContent = '✕';
+      del.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        if(!confirm('이 이미지를 삭제하시겠습니까?')) return;
+        if(item.published){
+          var hidden = loadImageHidden();
+          hidden.push(item.id);
+          saveImageHidden(hidden);
+        } else {
+          var drafts = loadImageDrafts().filter(function(i){ return i.id !== item.id; });
+          saveImageDrafts(drafts);
+        }
+        renderImages();
+      });
+      card.appendChild(img);
+      card.appendChild(cap);
+      card.appendChild(edit);
+      card.appendChild(del);
+      imgGrid.appendChild(card);
+    });
+  }
+
+  imgUploadBtn.addEventListener('click', function(){
+    var url = imgUrlInput.value.trim();
+    var nick = imgNickInput.value.trim();
+    var file = imgFileInput.files && imgFileInput.files[0];
+
+    function addDraft(data){
+      var drafts = loadImageDrafts();
+      drafts.unshift({ id: 'img_' + Date.now(), data: data, nick: nick });
+      saveImageDrafts(drafts);
+      imgFileInput.value = '';
+      imgUrlInput.value = '';
+      imgNickInput.value = '';
+      renderImages();
+    }
+
+    if(url){
+      addDraft(url);
+      return;
+    }
+    if(!file){ alert('이미지 파일을 선택하거나 이미지 URL을 입력해주세요.'); return; }
+    var reader = new FileReader();
+    reader.onload = function(e){ addDraft(e.target.result); };
+    reader.readAsDataURL(file);
+  });
+
+  imgExportBtn.addEventListener('click', function(){
+    var hidden = loadImageHidden();
+    var overrides = loadImageOverrides();
+    var published = SHARED_IMAGES
+      .filter(function(i){ return hidden.indexOf(i.id) === -1; })
+      .map(function(i){
+        var ov = overrides[i.id];
+        return { id: i.id, data: i.data, nick: ov ? ov.nick : i.nick };
+      });
+    var drafts = loadImageDrafts().map(function(i){
+      return { id: i.id, data: i.data, nick: i.nick };
+    });
+    var merged = drafts.concat(published);
+    imgExportText.value = JSON.stringify(merged, null, 2);
+    imgExportBox.hidden = false;
+  });
+
+  imgExportCopyBtn.addEventListener('click', function(){
+    imgExportText.select();
+    try{
+      document.execCommand('copy');
+      imgExportCopyBtn.textContent = '복사됨!';
+      setTimeout(function(){ imgExportCopyBtn.textContent = '복사하기'; }, 1500);
+    }catch(e){}
+  });
+
+  /* -------- 라이트박스 -------- */
+  var lightbox = document.getElementById('lightbox');
+  var lightboxImg = document.getElementById('lightboxImg');
+  var lightboxClose = document.getElementById('lightboxClose');
+  function openLightbox(src){
+    lightboxImg.src = src;
+    lightbox.hidden = false;
+  }
+  function closeLightbox(){
+    lightbox.hidden = true;
+    lightboxImg.src = '';
+  }
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', function(e){
+    if(e.target === lightbox) closeLightbox();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeLightbox();
+  });
+
+  /* -------- 기록 보관소 -------- */
+  var REC_DRAFTS_KEY = 'seongun_records_drafts_v1';
+  var REC_OVERRIDES_KEY = 'seongun_records_overrides_v1';
+  var REC_HIDDEN_KEY = 'seongun_records_hidden_v1';
+  var recordGrid = document.getElementById('recordGrid');
+  var recEmptyNote = document.getElementById('recEmptyNote');
+  var recTitleInput = document.getElementById('recTitleInput');
+  var recDescInput = document.getElementById('recDescInput');
+  var recUrlInput = document.getElementById('recUrlInput');
+  var recAuthorInput = document.getElementById('recAuthorInput');
+  var recAddBtn = document.getElementById('recAddBtn');
+  var recExportBtn = document.getElementById('recExportBtn');
+  var recExportBox = document.getElementById('recExportBox');
+  var recExportText = document.getElementById('recExportText');
+  var recExportCopyBtn = document.getElementById('recExportCopyBtn');
+
+  function loadRecordDrafts(){ return loadJSON(REC_DRAFTS_KEY, []); }
+  function saveRecordDrafts(list){ saveJSON(REC_DRAFTS_KEY, list); }
+  function loadRecordOverrides(){ return loadJSON(REC_OVERRIDES_KEY, {}); }
+  function saveRecordOverrides(obj){ saveJSON(REC_OVERRIDES_KEY, obj); }
+  function loadRecordHidden(){ return loadJSON(REC_HIDDEN_KEY, []); }
+  function saveRecordHidden(list){ saveJSON(REC_HIDDEN_KEY, list); }
+
+  function getMergedRecords(){
+    var hidden = loadRecordHidden();
+    var overrides = loadRecordOverrides();
+    var published = SHARED_RECORDS
+      .filter(function(i){ return hidden.indexOf(i.id) === -1; })
+      .map(function(i){
+        var ov = overrides[i.id];
+        var merged = { id: i.id, title: i.title, desc: i.desc, url: i.url, author: i.author, published: true };
+        if(ov){
+          merged.title = ov.title; merged.desc = ov.desc; merged.url = ov.url; merged.author = ov.author;
+        }
+        return merged;
+      });
+    var drafts = loadRecordDrafts().map(function(i){
+      return { id: i.id, title: i.title, desc: i.desc, url: i.url, author: i.author, published: false };
+    });
+    return drafts.concat(published);
+  }
+
+  function renderRecords(){
+    var list = getMergedRecords();
+    recordGrid.innerHTML = '';
+    recEmptyNote.style.display = list.length ? 'none' : 'block';
+    list.forEach(function(item){
+      var card = document.createElement('a');
+      card.className = 'record-card' + (isAdmin ? ' admin-mode' : '');
+      card.href = item.url;
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+
+      var arrow = document.createElement('span');
+      arrow.className = 'record-arrow';
+      arrow.textContent = '↗';
+
+      var title = document.createElement('div');
+      title.className = 'record-title';
+      title.textContent = item.title;
+
+      var desc = document.createElement('div');
+      desc.className = 'record-desc';
+      desc.textContent = item.desc || '';
+
+      var foot = document.createElement('div');
+      foot.className = 'record-foot';
+      var authorSpan = document.createElement('span');
+      authorSpan.textContent = 'Written by. ' + (item.author || '익명');
+      foot.appendChild(authorSpan);
+      if(!item.published){
+        var badge = document.createElement('span');
+        badge.className = 'draft-badge draft-badge-inline';
+        badge.textContent = 'DRAFT';
+        foot.appendChild(badge);
+      }
+
+      var del = document.createElement('button');
+      del.className = 'del-btn';
+      del.textContent = '삭제';
+      del.addEventListener('click', function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        if(!confirm('이 기록을 삭제하시겠습니까?')) return;
+        if(item.published){
+          var hidden = loadRecordHidden();
+          hidden.push(item.id);
+          saveRecordHidden(hidden);
+        } else {
+          var drafts = loadRecordDrafts().filter(function(i){ return i.id !== item.id; });
+          saveRecordDrafts(drafts);
+        }
+        renderRecords();
+      });
+
+      var edit = document.createElement('button');
+      edit.className = 'edit-btn';
+      edit.textContent = '수정';
+      edit.addEventListener('click', function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        var newTitle = prompt('타이틀 수정', item.title);
+        if(newTitle === null) return;
+        var newDesc = prompt('요약 설명 수정', item.desc || '');
+        if(newDesc === null) return;
+        var newUrl = prompt('외부 URL 수정', item.url);
+        if(newUrl === null) return;
+        var newAuthor = prompt('작성자 닉네임 수정', item.author || '');
+        if(newAuthor === null) return;
+        if(!newTitle.trim() || !newUrl.trim()){ alert('타이틀과 URL은 필수입니다.'); return; }
+        var updated = {
+          title: newTitle.trim(), desc: newDesc.trim(),
+          url: newUrl.trim(), author: newAuthor.trim()
+        };
+        if(item.published){
+          var overrides = loadRecordOverrides();
+          overrides[item.id] = updated;
+          saveRecordOverrides(overrides);
+        } else {
+          var drafts = loadRecordDrafts();
+          var target = drafts.find(function(i){ return i.id === item.id; });
+          if(target){
+            target.title = updated.title; target.desc = updated.desc;
+            target.url = updated.url; target.author = updated.author;
+          }
+          saveRecordDrafts(drafts);
+        }
+        renderRecords();
+      });
+
+      card.appendChild(arrow);
+      card.appendChild(title);
+      card.appendChild(desc);
+      card.appendChild(foot);
+      card.appendChild(edit);
+      card.appendChild(del);
+      recordGrid.appendChild(card);
+    });
+  }
+
+  recAddBtn.addEventListener('click', function(){
+    var title = recTitleInput.value.trim();
+    var url = recUrlInput.value.trim();
+    if(!title || !url){ alert('타이틀과 URL은 필수입니다.'); return; }
+    var drafts = loadRecordDrafts();
+    drafts.unshift({
+      id: 'rec_' + Date.now(),
+      title: title,
+      desc: recDescInput.value.trim(),
+      url: url,
+      author: recAuthorInput.value.trim()
+    });
+    saveRecordDrafts(drafts);
+    recTitleInput.value = '';
+    recDescInput.value = '';
+    recUrlInput.value = '';
+    recAuthorInput.value = '';
+    renderRecords();
+  });
+
+  recExportBtn.addEventListener('click', function(){
+    var hidden = loadRecordHidden();
+    var overrides = loadRecordOverrides();
+    var published = SHARED_RECORDS
+      .filter(function(i){ return hidden.indexOf(i.id) === -1; })
+      .map(function(i){
+        var ov = overrides[i.id];
+        return ov
+          ? { id: i.id, title: ov.title, desc: ov.desc, url: ov.url, author: ov.author }
+          : { id: i.id, title: i.title, desc: i.desc, url: i.url, author: i.author };
+      });
+    var drafts = loadRecordDrafts().map(function(i){
+      return { id: i.id, title: i.title, desc: i.desc, url: i.url, author: i.author };
+    });
+    var merged = drafts.concat(published);
+    recExportText.value = JSON.stringify(merged, null, 2);
+    recExportBox.hidden = false;
+  });
+
+  recExportCopyBtn.addEventListener('click', function(){
+    recExportText.select();
+    try{
+      document.execCommand('copy');
+      recExportCopyBtn.textContent = '복사됨!';
+      setTimeout(function(){ recExportCopyBtn.textContent = '복사하기'; }, 1500);
+    }catch(e){}
+  });
+
+  /* -------- 초기 렌더 -------- */
+  fetchSharedData();
+
+})();
+</script>
+
+</body>
+</html>
