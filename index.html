@@ -1381,12 +1381,12 @@
           <label>커미션주 닉네임 / 출처</label>
           <input type="text" id="imgNickInput" placeholder="예: @artist_name">
           <button class="btn-solid" id="imgUploadBtn">추가</button>
-          <div class="publish-hint">여기서 추가한 항목은 이 브라우저에만 보이는 <strong>초안(DRAFT)</strong>입니다. 다른 사람에게도 보이게 하려면 아래에서 JSON을 내보내 data.js에 반영해주세요.</div>
+          <div class="publish-hint">여기서 추가한 항목은 이 브라우저에만 보이는 <strong>초안(DRAFT)</strong>입니다. 다른 사람에게도 보이게 하려면 아래에서 JSON을 내보내 data.json에 반영해주세요.</div>
           <button class="btn-ghost" id="imgExportBtn" style="width:100%;">🔗 공유용 JSON 내보내기</button>
           <div class="export-box" id="imgExportBox" hidden>
             <textarea id="imgExportText" readonly rows="8"></textarea>
             <button class="btn-solid" id="imgExportCopyBtn" style="width:100%;">복사하기</button>
-            <div class="export-note">이 배열을 GitHub의 data.js 안 window.SEONGUN_SHARED_DATA.images 값으로 붙여넣고 커밋하면 모든 방문자에게 공개됩니다.</div>
+            <div class="export-note">이 JSON을 GitHub의 data.json "images" 항목에 붙여넣고 커밋하면 모든 방문자에게 공개됩니다.</div>
           </div>
         </div>
 
@@ -1413,12 +1413,12 @@
           <label style="display:block;font-size:11px;letter-spacing:0.14em;color:var(--ink-faint);margin-bottom:6px;">작성자 닉네임</label>
           <div class="field-row"><input type="text" id="recAuthorInput" placeholder="예: @author_name"></div>
           <button class="btn-solid" id="recAddBtn">기록 추가</button>
-          <div class="publish-hint">여기서 추가한 항목은 이 브라우저에만 보이는 <strong>초안(DRAFT)</strong>입니다. 다른 사람에게도 보이게 하려면 아래에서 JSON을 내보내 data.js에 반영해주세요.</div>
+          <div class="publish-hint">여기서 추가한 항목은 이 브라우저에만 보이는 <strong>초안(DRAFT)</strong>입니다. 다른 사람에게도 보이게 하려면 아래에서 JSON을 내보내 data.json에 반영해주세요.</div>
           <button class="btn-ghost" id="recExportBtn" style="width:100%;">🔗 공유용 JSON 내보내기</button>
           <div class="export-box" id="recExportBox" hidden>
             <textarea id="recExportText" readonly rows="8"></textarea>
             <button class="btn-solid" id="recExportCopyBtn" style="width:100%;">복사하기</button>
-            <div class="export-note">이 배열을 GitHub의 data.js 안 window.SEONGUN_SHARED_DATA.records 값으로 붙여넣고 커밋하면 모든 방문자에게 공개됩니다.</div>
+            <div class="export-note">이 JSON을 GitHub의 data.json "records" 항목에 붙여넣고 커밋하면 모든 방문자에게 공개됩니다.</div>
           </div>
         </div>
 
@@ -1479,29 +1479,28 @@
   var ADMIN_PASSWORD = '143mm';
   var isAdmin = false;
 
-  /* -------- 공유 데이터(JS) 설정 --------
+  /* -------- 공유 데이터(JSON) 설정 --------
      이미지/기록을 다른 방문자에게도 보여주려면, GitHub 등에 아래와 같은
-     내용의 data.js 파일(확장자는 .js!)을 올리고 raw URL을 SHARED_DATA_URL에 넣어주세요.
+     구조의 data.json 파일을 올리고 raw URL을 SHARED_DATA_URL에 넣어주세요.
 
-     window.SEONGUN_SHARED_DATA = {
+     {
        "images": [
          { "id": "img_001", "data": "https://raw.githubusercontent.com/.../sample.png", "nick": "@artist_name" }
        ],
        "records": [
          { "id": "rec_001", "title": "글 제목", "desc": "요약", "url": "https://...", "author": "@author_name" }
        ]
-     };
-
-     (neocities 등 일부 무료 호스팅은 보안 정책(CSP)상 fetch()로 다른 도메인에
-     접속하는 걸 막아둬서, data.json을 fetch로 불러오는 방식은 동작하지 않아요.
-     대신 <script> 태그로 외부 JS 파일을 불러오는 방식은 대부분 막지 않으므로,
-     여기서는 JSON이 아니라 위 형태의 JS 파일을 <script>로 동적 삽입해서 읽어옵니다.)
+     }
 
      관리자가 로그인 후 이미지/기록을 추가·수정·삭제하면 이 브라우저 안에만
      "임시(초안)" 상태로 저장됩니다. 다른 사람에게도 보이게 하려면 각 탭의
-     "공유용 JSON 내보내기" 버튼으로 최신 배열을 복사해 data.js의 해당 키
-     ("images" 또는 "records") 안에 붙여넣고 GitHub에 커밋해주세요. */
-  var SHARED_DATA_URL = 'https://raw.githubusercontent.com/H-a-ruuu/mp3/main/data.js';
+     "공유용 JSON 내보내기" 버튼으로 최신 JSON을 복사해 data.json에 붙여넣고
+     GitHub에 커밋해주세요.
+
+     (참고: neocities 같은 일부 무료 호스팅은 보안 정책(CSP)상 fetch()로 다른
+     도메인에 접속하는 걸 막아서 이 방식이 안 먹힐 수 있어요. GitHub Pages,
+     Netlify, Vercel 등에 배포한다면 문제없이 동작합니다.) */
+  var SHARED_DATA_URL = 'https://raw.githubusercontent.com/H-a-ruuu/mp3/main/data.json';
   var SHARED_IMAGES = [];
   var SHARED_RECORDS = [];
 
@@ -1511,22 +1510,20 @@
       renderRecords();
       return;
     }
-    var script = document.createElement('script');
-    script.src = SHARED_DATA_URL;
-    script.onload = function(){
-      var data = window.SEONGUN_SHARED_DATA || {};
-      SHARED_IMAGES = data.images || [];
-      SHARED_RECORDS = data.records || [];
-      renderImages();
-      renderRecords();
-    };
-    script.onerror = function(){
-      SHARED_IMAGES = [];
-      SHARED_RECORDS = [];
-      renderImages();
-      renderRecords();
-    };
-    document.head.appendChild(script);
+    fetch(SHARED_DATA_URL, { cache: 'no-store' })
+      .then(function(res){ return res.json(); })
+      .then(function(json){
+        SHARED_IMAGES = (json && json.images) || [];
+        SHARED_RECORDS = (json && json.records) || [];
+      })
+      .catch(function(){
+        SHARED_IMAGES = [];
+        SHARED_RECORDS = [];
+      })
+      .finally(function(){
+        renderImages();
+        renderRecords();
+      });
   }
 
   /* -------- 랜딩 게이트 -------- */
